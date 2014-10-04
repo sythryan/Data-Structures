@@ -1,0 +1,5 @@
+P:\CS-1520-Ada\lab08\uninsured.txt
+20
+90
+20
+

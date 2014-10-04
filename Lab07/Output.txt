@@ -1,0 +1,94 @@
+Please enter an infix expression
+The converted expression:
+Ape b Cat * d e / fig + g * - + 
+The original expression:
+Ape+b*Cat-(d/e+fig)*g
+
+Please enter an infix expression
+The converted expression:
+Ape b Cat * d e / fig + g * - + 
+The original expression:
+Ape   +   b   *   Cat   -   (  d  /  e   +   fig   ) * g
+
+Please enter an infix expression
+The converted expression:
+h i j + * k l - m + / m * 
+The original expression:
+h*(i+j) / (k-l+m)*m
+
+Please enter an infix expression
+The converted expression:
+apple 
+The original expression:
+apple
+
+Please enter an infix expression
+The converted expression:
+apple 
+The original expression:
+((((( apple )))))
+
+Please enter an infix expression
+The converted expression:
+Mildred Horace Ralph - / 
+The original expression:
+((((((     (Mildred) / (Horace - Ralph)   ) ) ) ) ) )
+
+Please enter an infix expression
+The converted expression:
+Mildred Horace Ralph - / 
+The original expression:
+(((((((    (Mildred) / (Horace - Ralph)   ) ) ) ) ) ) )
+
+Please enter an infix expression
+The expression is too long to convert
+
+Please enter an infix expression
+The expression is too long to convert
+
+Please enter an infix expression
+The converted expression:
+Ape b Cat + * d e - fig + g * / 
+The original expression:
+Ape*(b+Cat) / ((d-e+fig)*g)
+
+Please enter an infix expression
+The converted expression:
+q r s + * t u - v + w * / 
+The original expression:
+(q*(r+s)) / ((t-u+v)*w)
+
+Please enter an infix expression
+The converted expression:
+Ape b + Cat * d + e * fig + g * 
+The original expression:
+(((Ape+b) * Cat + d) * e + fig) * g
+
+Please enter an infix expression
+The converted expression:
+g h + i j + k m - / 6 + * planet - 
+The original expression:
+(g+h) * ((i + j) / (k - m) + 6 ) -planet
+
+Please enter an infix expression
+The converted expression:
+Ape boy Cat * d eek / fig girl * + - + 
+The original expression:
+Ape + boy * Cat - d / eek + fig * girl
+
+Please enter an infix expression
+The expression is too long to convert
+
+Please enter an infix expression
+The converted expression:
+275 fig g - elf * d - z * y - x * + 
+The original expression:
+275  +  (  ((  ((fig - g) * elf) - d) * z) - y ) * x
+
+Please enter an infix expression
+The converted expression:
+Ape B Cat# * 5 ???? / $17% Q * + + - 
+The original expression:
+Ape-B*Cat#+5/????+$17%*Q
+
+Please enter an infix expression

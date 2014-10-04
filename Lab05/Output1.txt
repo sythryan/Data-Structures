@@ -1,0 +1,10 @@
+End of file tests:
+Empty file, expected True:   True
+one word file, expected False :   False
+unopened file, expected status_error:   Status_Error
+
+
+Get Tests: 
+No words in file, expected End_Error:   End_Error
+File not open, expected Status_Error:   Status_Error
+Two words in file, expected Hello Good:   Hello Goodbye

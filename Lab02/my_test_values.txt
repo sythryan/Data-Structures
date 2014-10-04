@@ -1,0 +1,45 @@
+Successful vector addition
++
+0.0 0.0 0.0
+0.0 0.0 0.0
+0.0 0.0 0.0
+Successful vector addition
++
+1.0 1.0 1.0
+2.0 2.0 2.0
+3.0 3.0 3.0
+Successful vector addition
++
+-1.0 -1.0 -1.0
+-2.0 -2.0 -2.0
+-3.0 -3.0 -3.0
+Successful vector subtraction
+-
+0.0 0.0 0.0
+0.0 0.0 0.0
+0.0 0.0 0.0
+Successful vector subtraction
+-
+1.0 1.0 1.0
+2.0 2.0 2.0
+-1.0 -1.0 -1.0
+Successful vector subtraction
+-
+-1.0 -1.0 -1.0
+-2.0 -2.0 -2.0
+1.0 1.0 1.0
+Successful cross product
+*
+0.0 0.0 0.0
+0.0 0.0 0.0
+0.0 0.0 0.0
+Successful cross product
+*
+1.0 2.0 3.0
+3.0 2.0 1.0
+-4.0 8.0 -4.0
+Successful cross product
+*
+-1.0 -2.0 -3.0
+-3.0 -2.0 -1.0
+-4.0 8.0 -4.0

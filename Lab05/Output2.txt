@@ -1,0 +1,60 @@
+Testing package Unbounded_Word_IO
+
+
+Testing End_Of_File
+
+Passed test #1
+Passed test #2
+Passed test #3
+Passed test #4
+Test #5 is covered in the tests for Get
+
+
+Testing Get
+You need to check the output against the test plan
+
+Test #6
+hello
+
+
+Test #7
+hello
+
+
+Test #8
+hello Mildred Smedley
+
+
+Test #9
+hello Mildred Smedley
+hello Horace Beasley
+Goodbye
+
+
+
+
+Testing Unget
+You need to check the output against the test plan
+
+Test #10
+hello 
+
+
+Test #11
+goodbye hello Mildred Smedley
+
+
+Test #12
+Horace goodbye hello Mildred Smedley
+
+
+
+
+Testing End_Error exception
+Test #13
+hello Mildred Smedley
+
+Successfully raised End_Error
+
+
+All done with tests

@@ -1,0 +1,43 @@
+-- Integrate is a generic subprogram for integrating a mathematical
+-- function.  It uses an adaptive trapezoidal rule method for integration.
+--
+-- It is adaptive in that the number of trapezoids used in a
+-- particular region of the function is determined dynamically
+-- to meet the given error criteria.
+
+
+function Integrate (F : not null access function (X : in Real) return Real;
+                    A       : in  Real;
+                    B       : in  Real;
+                    Epsilon : in  Real) return Real is
+
+   Result_One : Real;   -- Result of one trapezoid
+   Result_Two : Real;   -- Result of two trapezoids
+   C          : Real;   -- Point half way between A and B
+   Estimate   : Real;   -- Estimate of error
+
+begin
+   -- Midpoint
+   C := (A + B) / 2.0;
+   -- one trapezoid (total area)
+   Result_One := 0.5 * (F.all (A) + F.all (B)) * (B - A);
+   -- Two trapezoids (Left area + Right area)
+   Result_Two := 0.5 * (F.all (A) + F.all (C)) * (C - A)
+               + 0.5 * (F.all (C) + F.all (B)) * (B - C);
+   -- Estimate of error
+   Estimate := (Result_One - Result_Two) / 3.0;
+
+   if Estimate < Epsilon then
+      return Result_Two;
+   else
+      return Integrate (F => F,
+                        A => A,
+                        B => C,
+                        Epsilon => Epsilon / 2.0)
+           + Integrate (F => F,
+                        A => C,
+                        B => B,
+                        Epsilon => Epsilon / 2.0);
+   end if;
+end Integrate;
+

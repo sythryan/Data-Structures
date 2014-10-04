@@ -1,0 +1,5 @@
+P:\CS-1520-Ada\lab08\beasley.txt
+25
+75
+20
+

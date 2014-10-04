@@ -1,0 +1,68 @@
+Enter the name of the data file
+
+Mildred   participates in 6 hobbies
+
+Horace    participates in 7 hobbies
+
+Ralph     participates in 5 hobbies
+
+Sally     participates in 7 hobbies
+
+Joe       participates in 5 hobbies
+
+
+
+Hobbies in which everyone participates
+OLD_MAID
+BRIDGE
+HIKING
+READING
+
+
+Hobbies in which at least one person participates
+SKIING
+SKATING
+TENNIS
+BASEBALL
+SOCCER
+HEARTS
+OLD_MAID
+BRIDGE
+MUSIC
+PHOTOGRAPHY
+PAINTING
+GARDENING
+MOUNTAIN_CLIMBING
+HIKING
+KNITTING
+READING
+WOODWORKING
+
+
+Hobbies in which someone but not everyone participates
+SKIING
+SKATING
+TENNIS
+BASEBALL
+SOCCER
+HEARTS
+MUSIC
+PHOTOGRAPHY
+PAINTING
+GARDENING
+MOUNTAIN_CLIMBING
+KNITTING
+WOODWORKING
+
+
+Hobbies in which no one participates
+FOOTBALL
+BASKETBALL
+FIVE_HUNDRED
+DANCING
+FISHING
+HUNTING
+SEWING
+NET_SURFING
+
+

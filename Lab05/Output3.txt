@@ -1,0 +1,4 @@
+Enter the name of your data file?
+The number of words in the file was 50
+
+The average number of letters in a word in the file was 64.060

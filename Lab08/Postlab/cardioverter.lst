@@ -1,0 +1,222 @@
+
+GNAT GPL 2012 (20120509)
+Copyright 1992-2012, Free Software Foundation, Inc.
+
+
+Checking: cardioverter.adb (source file time stamp: 2013-03-28 14:46:54)
+
+     1. with Ada.Text_IO;
+     2. with Ada.Float_Text_IO;
+     3. with Ada.Integer_Text_IO;
+     4. with Heart;
+     5. with Ada.Numerics.Elementary_Functions;
+     6. use  Ada.Numerics.Elementary_Functions;
+     7. procedure Cardioverter is
+     8.
+     9. -- This program simulates the action of a Cardioverter-Defibrillator, a device that
+    10. -- is implanted in a patient to check and maintain correct heart rhythms.
+    11. --
+    12. -- Written by Syth Ryan
+    13. --
+    14. -- Input
+    15. --       From Keyboard    Patient's last name
+    16. --                        Lower bound of healthy zero crossings
+    17. --                        Upper bound of healthy zero crossings
+    18. --                        Number of readings to use in activity calculations
+    19. --
+    20. --       From Patient     Heart Muscle Activity
+    21. --
+    22. -- Output
+    23. --       Monitor initiation and termination messages.
+    24. --       Number of zero crossings for each heart monitoring cycle.
+    25. --       Statistics (mean and standard deviation of heart activity readings)
+    26. --       Status of heart for each heart monitoring cycle
+    27. --       Sensor failure messages.
+    28. --
+    29. -- Assumptions
+    30. --       1.  Patient's last name contains no more than 60 characters
+    31. --       2.  User enters a valid patient name
+    32. --       3.  User enters valid lower and upper bound values
+    33. --       4.  User enters valid number of readings for calculations
+    34.
+    35.
+    36.    subtype Name_String is String (1 .. 60);
+    37.
+    38.    type Array_Type is array (Integer range <>) of Integer;
+    39.
+    40.    -------------------------------------------------------------------------------
+    41.    function Average_Of (Values : in Array_Type) return Float is
+    42.    -- Find the average of a group of numbers
+    43.    --
+    44.    -- Preconditions  : Values'Length > 0
+    45.    --
+    46.    -- Postconditions : The average of Values is returned
+    47.
+    48.       Sum : Float;  -- The sum of the Values
+    49.    begin
+    50.       Sum := 0.0;
+    51.       -- Sum the numbers in Values
+    52.       -- Each iteration, one value is added to the sum
+    53.       for Index in Values'Range loop
+    54.          Sum := Sum + Float (Values (Index));
+    55.       end loop;
+    56.       -- Calculate and return the average
+    57.       return Sum / Float (Values'Length);
+    58.    end Average_Of;
+    59.
+    60.
+    61.    -------------------------------------------------------------------------------
+    62.    function Standard_Deviation_Of (Values : in Array_Type) return Float is
+    63.    -- Find the standard deviation of a group of numbers
+    64.    --
+    65.    -- Preconditions  : Values'Length > 1
+    66.    --
+    67.    -- Postconditions : The standard deviation of Values is returned
+    68.
+    69.       Average        : Float;  -- The average of Values
+    70.       Sum_Of_Squares : Float;  -- Sum of the squared variances of Values
+    71.    begin
+    72.       Sum_Of_Squares := 0.0;
+    73.       Average := Average_Of (Values);
+    74.       -- Sum the squares of the variances in Values
+    75.       -- Each iteration, add one square of a variance to the sum
+    76.       for Index in Values'Range loop
+    77.          Sum_Of_Squares := Sum_Of_Squares + (Float (Values (Index)) - Average) ** 2;
+    78.       end loop;
+    79.       -- Calculate and return the standard deviation
+    80.       return Sqrt (Sum_Of_Squares / Float (Values'Length - 1));
+    81.    end Standard_Deviation_Of;
+    82.
+    83.
+    84.    ---------------------------------------------------------------------------------
+    85.    function Convert (Num_Readings : in Positive;
+    86.                      Percent      : in Positive) return Natural is
+    87.    -- Converts a whole number to a percent and return the number of
+    88.    --    readings rounded to the nearest whole number
+    89.    --
+    90.    -- Preconditions  : none
+    91.    --
+    92.    -- Postconditions : The percent of the number of readings is returned
+    93.       Float_Readings : Float;
+    94.    begin
+    95.       Float_Readings := Float (Percent) / 100.0 * Float (Num_Readings);
+    96.       return Integer (Float_Readings);
+    97.    end Convert;
+    98.
+    99.    ---------------------------------------------------------------------------------
+   100.    function negative (Num : in Heart.Reading) return Boolean is
+   101.    -- Test wether a Num is negative
+   102.    --
+   103.    -- Preconditions  : none
+   104.    --
+   105.    -- Postconditions : True is returned if Num is negative else false is returned
+   106.    begin
+   107.       return Integer (Num) < 0;
+   108.    end negative;
+   109.
+   110.    ---------------------------------------------------------------------------------
+   111.    procedure Process (Initial_Reading : in out Heart.Reading;
+   112.                       Num_Readings    : in  Positive;
+   113.                       ZCC             : out Natural;
+   114.                       Value_Array     : out Array_Type) is
+   115.       Current_Read  : Heart.Reading;   -- Current reading
+   116.       Previous_Read : Heart.Reading;   -- Previous reading
+   117.       Count         : Integer;         -- Number of Readings so far
+   118.    begin
+   119.       Value_Array := (others => 0);
+   120.       Previous_Read := Initial_Reading;
+   121.       Count := 0;
+   122.       ZCC   := 0;
+   123.       loop
+   124.          exit when Count = Num_Readings;
+   125.          Count := Count + 1;
+   126.          Current_Read := Heart.Sense;
+   127.          if (negative (Previous_Read) and not negative (Current_Read)) or
+   128.                (not negative (Previous_Read) and negative (Current_Read)) then
+   129.             ZCC := ZCC + 1;
+   130.          end if;
+   131.          Value_Array (Count) := Integer (Current_Read);
+   132.          Previous_Read := Current_Read;
+   133.       end loop;
+   134.       Initial_Reading := Current_Read;
+   135.    end Process;
+   136.
+   137. ------------------------------------------------------------------------------------
+   138.    -- Patient data source
+   139.    Patient_Name : Name_String;             -- The patient's last name
+   140.    Length       : Positive;                -- Number of characters in Name
+   141.
+   142.    Lower_Bound     : Positive range 10 .. 30; -- Upper Percent as a whole number
+   143.    Upper_Bound     : Positive range 70 .. 95; -- Lower Percent as a whole number
+   144.    Num_Readings    : Positive range 12 .. 48; -- Number of readings
+   145.    Initial_Reading : Heart.Reading;           -- Initial and previous reading
+   146.    Low_Amount      : Natural;                 -- Lower amount of readings
+   147.    Up_Amount       : Natural;                 -- Upper amount of readings
+   148.    ZCC             : Natural;                 -- Zero Cross Count
+   149.    Value_Array     : Array_Type (1 .. 48);    -- Array of current readings
+   150.
+   151. begin
+   152.    -- Prepare the patient
+   153.    Ada.Text_IO.Put_Line ("Enter the patient's name");
+   154.    Ada.Text_IO.Get_Line (Item => Patient_Name, Last => Length);
+   155.    Heart.Initialize (Patient_Name (1 .. Length));
+   156.
+   157.    -- Set up the parameters of the Cardioverter-Defibrillator
+   158.    Ada.Text_IO.Put_Line ("Enter the lower bound (percent)");
+   159.    Ada.Integer_Text_IO.Get (Lower_Bound);
+   160.    Ada.Text_IO.Put_Line ("Enter the upper bound (percent)");
+   161.    Ada.Integer_Text_IO.Get (Upper_Bound);
+   162.    Ada.Text_IO.Put_Line ("Enter number of readings used in a calculation");
+   163.    Ada.Integer_Text_IO.Get (Num_Readings);
+   164.    Initial_Reading := 0;
+   165.
+   166.    -- Convert percentages into a number of readings (rounded to nearest reading)
+   167.    Low_Amount := Convert (Num_Readings, Lower_Bound);
+   168.    Up_Amount  := Convert (Num_Readings, Upper_Bound);
+   169.
+   170.    Ada.Text_IO.New_Line;
+   171.    Ada.Text_IO.Put_Line ("Beginning patient heart monitoring");
+   172.    Ada.Text_IO.New_Line;
+   173.
+   174.    loop
+   175.       exit when not Heart.Insured;
+   176.       begin
+   177.          Process (Initial_Reading => Initial_Reading,
+   178.                   Num_Readings    => Num_Readings,
+   179.                   ZCC             => ZCC,
+   180.                   Value_Array     => Value_Array);
+   181.          Ada.Integer_Text_IO.Put (ZCC, 5);
+   182.          Ada.Float_Text_IO.Put (Item => Average_Of (Value_Array (Value_Array'First .. Num_Readings)),
+   183.                                 Fore => 5,
+   184.                                 Aft  => 1,
+   185.                                 Exp  => 0);
+   186.          Ada.Float_Text_IO.Put
+   187.                       (Item => Standard_Deviation_Of (Value_Array (Value_Array'First .. Num_Readings)),
+   188.                        Fore => 4,
+   189.                        Aft  => 2,
+   190.                        Exp  => 0);
+   191.          if ZCC > Up_Amount then
+   192.             Ada.Text_IO.Put (" Fibrillation!");
+   193.             Heart.Shock;
+   194.          elsif ZCC < Low_Amount then
+   195.             Ada.Text_IO.Put (" Cardiac Arrest!");
+   196.             Heart.Shock;
+   197.          else
+   198.             Ada.Text_IO.Put (" Normal Heart Rhythm");
+   199.          end if;
+   200.       exception
+   201.          when Heart.SENSE_ERROR =>
+   202.             Ada.Text_IO.Put ("Sensor Failure!");
+   203.       end;
+   204.       Ada.Text_IO.New_Line;
+   205.    end loop;
+   206.
+   207.    Ada.Text_IO.New_Line (2);
+   208.    Ada.Text_IO.Put_Line ("Insurance terminated!");
+   209.    Ada.Text_IO.Put_Line ("Patient's Cardioverter-Defibrillator removed.");
+   210.
+   211. end Cardioverter;
+   212.
+   213.
+
+ 213 lines: No errors

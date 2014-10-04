@@ -1,0 +1,144 @@
+with Integrate;
+with Ada.Text_IO;
+with Ada.Exceptions;
+with Ada.Numerics.Generic_Elementary_Functions;
+procedure Test_Integrate is
+
+-- A program to test the generic function Integrate
+
+   type High_Precision is digits 15;
+   package Precise_IO  is new Ada.Text_IO.Float_IO (Num => High_Precision);
+
+   package Elementary_Functions is new
+           Ada.Numerics.Generic_Elementary_Functions (High_Precision);
+   use Elementary_Functions;
+
+   function Integration is new Integrate (High_Precision);
+
+
+   ----------------------------------------------------------------------------
+   function One (X : in High_Precision) return High_Precision is
+   -- The following pragma instructs the compiler not
+   -- to issue a warning for not using the parameter X
+   pragma Warnings (Off, X);
+   begin
+      return 1.0;
+   end One;
+
+   ----------------------------------------------------------------------------
+   function Two (X : in High_Precision) return High_Precision is
+   begin
+      return X;
+   end Two;
+
+   ----------------------------------------------------------------------------
+   function Three (X : in High_Precision) return High_Precision is
+   begin
+      return Exp (-X ** 2.0);
+   end Three;
+
+   ----------------------------------------------------------------------------
+   function Four (X : in High_Precision) return High_Precision is
+   begin
+      if (1.0 / 3.0 - X) < 0 then
+         return -1 * abs ((1.0 / 3.0) ** (1.0 / 3.0));
+      else
+         return (1.0 / 3.0 - X) ** (1.0 / 3.0);
+      end if;
+   end Four;
+
+   ----------------------------------------------------------------------------
+   function Five (X : in High_Precision) return High_Precision is
+   begin
+      return 4.0 / (1.0 + X ** 2);
+   end Five;
+
+   ----------------------------------------------------------------------------
+   function Six (X : in High_Precision) return High_Precision is
+   begin
+      return Sin (X) - 0.5 * Cos (X);
+   end Six;
+
+-------------------------------------------------------------------------------
+   A       : High_Precision;  -- Left bound of integration
+   B       : High_Precision;  -- Right bound of intergration
+   Epsilon : High_Precision;  -- Acceptable error
+
+begin  -- Test_Integrate
+   Input_Loop :  -- Calculate all of the areas requested
+   loop          -- Each iteration, calculate one area
+      begin
+         Ada.Text_IO.Put_Line ("Enter A and B   (B < A to terminate program)");
+         Precise_IO.Get (A);
+         Precise_IO.Get (B);
+
+         exit Input_Loop when B < A;
+
+         Ada.Text_IO.Put_Line ("Enter Epsilon");
+         Precise_IO.Get (Epsilon);
+         Ada.Text_IO.New_Line;
+
+         Ada.Text_IO.Put ("For A = ");
+         Precise_IO.Put (Item => A, Fore => 1, Aft => 4, Exp => 0);
+         Ada.Text_IO.Put (", B = ");
+         Precise_IO.Put (Item => B, Fore => 1, Aft => 4, Exp => 0);
+         Ada.Text_IO.Put (", and Epsilon = ");
+         Precise_IO.Put (Item => Epsilon, Fore => 1,
+                         Aft  => High_Precision'Digits / 2,
+                         Exp  => 0);
+         Ada.Text_IO.New_Line (2);
+
+         ---------------------------------------------------------------
+         Ada.Text_IO.Put_Line ("  Result for f(1) is");
+         Precise_IO.Put (Item => Integration (One'Access, A, B, Epsilon),
+                         Fore => 3,
+                         Aft  => High_Precision'Digits,
+                         Exp  => 4);
+         Ada.Text_IO.New_Line (2);
+         ---------------------------------------------------------------
+         Ada.Text_IO.Put_Line ("  Result for f(x) is");
+         Precise_IO.Put (Item => Integration (Two'Access, A, B, Epsilon),
+                         Fore => 3,
+                         Aft  => High_Precision'Digits,
+                         Exp  => 4);
+         Ada.Text_IO.New_Line (2);
+         ---------------------------------------------------------------
+         Ada.Text_IO.Put_Line ("  Result for f(e to the -x squared power) is");
+         Precise_IO.Put (Item => Integration (Three'Access, A, B, Epsilon),
+                         Fore => 3,
+                         Aft  => High_Precision'Digits,
+                         Exp  => 4);
+         Ada.Text_IO.New_Line (2);
+
+         ---------------------------------------------------------------
+         Ada.Text_IO.Put_Line ("  Result for f((1/3 - x) to the 1/3 power) is");
+         Precise_IO.Put (Item => Integration (Four'Access, A, B, Epsilon),
+                         Fore => 3,
+                         Aft  => High_Precision'Digits,
+                         Exp  => 4);
+         Ada.Text_IO.New_Line (2);
+
+         ---------------------------------------------------------------
+         Ada.Text_IO.Put_Line ("  Result for f(4/(1 + x squared)) is");
+         Precise_IO.Put (Item => Integration (Five'Access, A, B, Epsilon),
+                         Fore => 3,
+                         Aft  => High_Precision'Digits,
+                         Exp  => 4);
+         Ada.Text_IO.New_Line (2);
+
+         ---------------------------------------------------------------
+         Ada.Text_IO.Put_Line ("  Result for f(sin(x) - 0.5 cos(x)) is");
+         Precise_IO.Put (Item => Integration (Six'Access, A, B, Epsilon),
+                         Fore => 3,
+                         Aft  => High_Precision'Digits,
+                         Exp  => 4);
+         Ada.Text_IO.New_Line (2);
+      exception
+         when The_Error : others =>
+            Ada.Text_IO.Put_Line (Ada.Exceptions.Exception_Name (The_Error) &
+                                   Ada.Exceptions.Exception_Message (The_Error));
+      end;
+   end loop Input_Loop;
+   Ada.Text_IO.New_Line;
+   Ada.Text_IO.Put_Line ("All Done");
+end Test_Integrate;

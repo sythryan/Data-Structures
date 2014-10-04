@@ -1,0 +1,211 @@
+
+GNAT GPL 2012 (20120509)
+Copyright 1992-2012, Free Software Foundation, Inc.
+
+
+Checking: assign07.adb (source file time stamp: 2013-03-14 19:59:54)
+
+     1. with Stack;
+     2. with Ada.Strings.Maps;
+     3. with Ada.Text_IO;              use Ada.Text_IO;
+     4. with Ada.Strings.Unbounded;    use Ada.Strings.Unbounded;
+     5. with Ada.Text_IO.Unbounded_IO; use Ada.Text_IO.Unbounded_IO;
+     6.
+     7. procedure Assign07 is
+     8.
+     9. -- Written by Syth Ryan
+    10. --
+    11. -- This program converts an infix expression to a post fix expression
+    12. --
+    13. -- Input  :   An infix expression
+    14. --
+    15. -- Output :   Prompts
+    16. --            The converted expression
+    17. --            The original expression
+    18. --
+    19. -- Assumptions  : The only operators are +, -, *, /
+    20. --                Operands may contain any graphic characters any graphic
+    21. --                   other than the operators, parentheses, and blanks
+    22. --                All infix expressions entered are Valid
+    23.
+    24.
+    25.    package My_Stack is new Stack (Element_Type => Unbounded_String);
+    26.
+    27.    ----------------------------------------------------------------------------
+    28.    function P_Value (Item : in Unbounded_String) return Natural is
+    29.    -- Purpose  : Determine precedence
+    30.    -- Preconditions  : none
+    31.    -- Postconditions : The precedence value of item is returned
+    32.    begin
+    33.       if Item = "(" or Item = ")" then
+    34.          return 1;
+    35.       elsif Item = "+" or Item = "-"  then
+    36.          return 2;
+    37.       elsif Item = "*" or Item = "/" then
+    38.          return 3;
+    39.       else                -- Not an operator
+    40.          return 0;
+    41.       end if;
+    42.    end P_Value;
+    43.
+    44.
+    45.    ----------------------------------------------------------------------------
+    46.    procedure Process_Slice (Slice   : in     Unbounded_String;
+    47.                             Stack   : in out My_Stack.Stack_Type;
+    48.                             Result  :    out Unbounded_String) is
+    49.    -- Purpose : place Slice either in the stack or appened to Result
+    50.    -- Preconditions  : Stack must have at least one element and is not a blank
+    51.    -- Postconditions : Slice is either placed on the stack or to the end
+    52.    --                  of Result
+    53.
+    54.       Popped : Unbounded_String;  -- the element to be check and or appended to Result
+    55.    begin
+    56.       My_Stack.Pop (Stack => Stack,
+    57.                     Popped_Element => Popped);
+    58.       if P_Value (Slice) > 1 then                -- if an operator
+    59.          if P_Value (Slice) <= P_Value (Popped) then
+    60.             Append (Source => Result,
+    61.                     New_Item => Popped & ' ');
+    62.          else
+    63.             My_Stack.Push (Stack => Stack,
+    64.                            New_Element => Popped);
+    65.          end if;
+    66.          My_Stack.Push (Stack => Stack,
+    67.                         New_Element => Slice);
+    68.       elsif Slice = "(" then
+    69.          My_Stack.Push (Stack => Stack,
+    70.                         New_Element => Popped);
+    71.          My_Stack.Push (Stack => Stack,
+    72.                         New_Element => Slice);
+    73.       elsif Slice = ")" then
+    74.          loop
+    75.             exit when Popped = "(";
+    76.             Append (Source => Result,
+    77.                     New_Item => Popped & ' ');
+    78.             My_Stack.Pop (Stack => Stack,
+    79.                        Popped_Element => Popped);
+    80.          end loop;
+    81.       else                                       -- Operand
+    82.          Append (Source => Result,
+    83.                  New_Item => Slice & ' ');
+    84.          My_Stack.Push (Stack => Stack,
+    85.                         New_Element => Popped);
+    86.       end if;
+    87.    end Process_Slice;
+    88.
+    89.    ----------------------------------------------------------------------------
+    90.    procedure Convert (Input  : in     Unbounded_String;
+    91.                       Result :    out Unbounded_String) is
+    92.    -- Purpose : Convert a Infix expression to a postfix expression
+    93.    -- Preconditions  : none
+    94.    -- Postconditions : Result is a postfix expression with the same
+    95.    --                  Value as the infix expression of Input
+    96.
+    97.       Temp   : Unbounded_String; -- Copy of Input, allows us to change it without Changing Input
+    98.       Slice  : Unbounded_String; -- operator or operand
+    99.       Popped : Unbounded_String; -- Slice to appened to result
+   100.       First  : Natural;          -- Index of beginning of element
+   101.       Last   : Natural;          -- Index of end of token or operator
+   102.       Stack  : My_Stack.Stack_Type (10);  -- Stack of operators
+   103.
+   104.    begin
+   105.       My_Stack.Clear (Stack);
+   106.       Temp  := Input;
+   107.
+   108.       -- Process the Input String
+   109.       -- Each iteration, Process one token
+   110.       loop
+   111.          First := 1;
+   112.          Last  := 1;
+   113.          exit when Length (Temp) = 0;
+   114.          -- Take off any leading blanks
+   115.          Trim (Source => Temp,
+   116.                Side   => Ada.Strings.Left);
+   117.          -- Slice off First character (non blank)
+   118.          Unbounded_Slice (Source => Temp,
+   119.                           Target => Slice,
+   120.                           Low    => First,
+   121.                           High   => First);
+   122.          if P_Value (Slice) = 0 then
+   123.             -- find operand
+   124.             Find_Token (Source => Temp,
+   125.                         Set    => Ada.Strings.Maps.To_Set ("()*/-+ "),
+   126.                         Test   => Ada.Strings.Outside,
+   127.                         First  => First,
+   128.                         Last   => Last);
+   129.             -- slice operand
+   130.             Unbounded_Slice (Source => Temp,
+   131.                              Target => Slice,
+   132.                              Low    => First,
+   133.                              High   => Last);
+   134.          end if;
+   135.
+   136.
+   137.          if My_Stack.Empty (Stack) then
+   138.             if P_Value (Slice) > 0 or Slice = "(" then
+   139.                My_Stack.Push (Stack => Stack,
+   140.                               New_Element => Slice);
+   141.             else
+   142.                Append (Source => Result,
+   143.                        New_Item => Slice & ' ');
+   144.             end if;
+   145.          else
+   146.             Process_Slice (Slice  => Slice,
+   147.                            Stack  => Stack,
+   148.                            Result => Result);
+   149.          end if;
+   150.
+   151.          Delete (Source => Temp,
+   152.                  From   => First,
+   153.                  Through => Last);
+   154.       end loop;
+   155.
+   156.       -- Finish appending the remaining operators
+   157.       -- Each iteration, Append one operator
+   158.       loop
+   159.          exit when My_Stack.Empty (Stack);
+   160.          My_Stack.Pop (Stack          => Stack,
+   161.                        Popped_Element => Popped);
+   162.          Append       (Source   => Result,
+   163.                        New_Item => Popped & ' ');
+   164.       end loop;
+   165.    end Convert;
+   166.
+   167.
+   168. -------------------------------------------------------------------------------
+   169.
+   170.    Infix   : Unbounded_String;      -- Expression read from the user
+   171.    Result  : Unbounded_String;      -- Expression after conversion
+   172.
+   173. begin
+   174.
+   175.    -- Convert Infix to Postfix until a blank or null string is entered
+   176.    -- Each iteration convert one expression
+   177.    loop
+   178.       Result := Null_Unbounded_String;
+   179.       -- Read in an infix expression
+   180.       Put_Line ("Please enter an infix expression");
+   181.       Get_Line (Infix);
+   182.       Trim (Source => Infix,
+   183.             Side   => Ada.Strings.Both);
+   184.       exit when Infix = Null_Unbounded_String;         -- exit when Null
+   185.       begin
+   186.          -- Convert the expression
+   187.          Convert (Input  => Infix,
+   188.                   Result => Result);
+   189.          -- Display the result
+   190.          Put_Line ("The converted expression:");
+   191.          Put_Line (Result);
+   192.          -- Display original Infix expression
+   193.          Put_Line ("The original expression:");
+   194.          Put_Line (Infix);
+   195.          New_Line;
+   196.       exception
+   197.          when My_Stack.OVERFLOW =>
+   198.             Put_Line ("The expression is too long to convert");
+   199.             New_Line;
+   200.       end;
+   201.    end loop;
+   202. end Assign07;
+
+ 202 lines: No errors
